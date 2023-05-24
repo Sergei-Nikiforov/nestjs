@@ -10,7 +10,7 @@ import { FindOneOptions } from 'typeorm';
 @Injectable()
 export class TasksService {
     constructor(
-        @InjectRepository(TasksRepository)
+//        @InjectRepository(TasksRepository)
         private tasksRepository: TasksRepository,
     ) {}
 
@@ -70,6 +70,8 @@ export class TasksService {
 
         await this.tasksRepository.save(task);
         return task;
+
+//        return this.tasksRepository.createTask({ title, description });
     }
 
 
