@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from './tasks/task.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 // import { TaskScheduleModule } from './tasks/task-schedule/task-schedule.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    AuthModule,
 //    ScheduleModule.forRoot(),
   ],
 })
