@@ -12,9 +12,10 @@ export class TasksRepository extends Repository<Task> {
     super(Task, dataSource.createEntityManager());
   }
  
-  public async getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+  public async getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
     const { status, search } = filterDto;
     const query = this.createQueryBuilder('task');
+    query.where({ user });
 
     if (status) {
       query.andWhere('task.status = :status', { status });
@@ -22,7 +23,7 @@ export class TasksRepository extends Repository<Task> {
 
     if (search) {
       query.andWhere(
-        'LOWER(task.title) LIKE LOWER(:search) OR LOWER(task.description) LIKE LOWER(:search)',
+        '(LOWER(task.title) LIKE LOWER(:search) OR LOWER(task.description) LIKE LOWER(:search))',
         { search: `%${search}%` },
       )
     }
@@ -45,8 +46,8 @@ export class TasksRepository extends Repository<Task> {
     return task;
   }
 
-  public async deleteTask(id: string): Promise<DeleteResult> {
-    const result = await this.delete(id);
+  public async deleteTask(id: string, user: User): Promise<DeleteResult> {
+    const result = await this.delete({ id, user });
 
     if (!result.affected) {
       throw new NotFoundException(`Task with ID "${id}" not found`);
@@ -55,10 +56,11 @@ export class TasksRepository extends Repository<Task> {
     return result;
   }
 
-  public async getTaskById(id: string): Promise<Task> {
+  public async getTaskById(id: string, user: User): Promise<Task> {
     const options: FindOneOptions = {
       where: {
           id,
+          user,
       }
     }
 
@@ -72,8 +74,8 @@ export class TasksRepository extends Repository<Task> {
   }
 
 
-  public async updateTask(id: string, status: TaskStatus): Promise<Task> {
-    const task = await this.getTaskById(id);
+  public async updateTask(id: string, status: TaskStatus, user: User): Promise<Task> {
+    const task = await this.getTaskById(id, user);
 
     task.status = status;
     await this.save(task);
